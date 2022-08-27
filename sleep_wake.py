@@ -11,16 +11,14 @@ It will send a notification if the set time
 is equivalent to the current time.
 """
 
-from datetime import datetime
-import pync
+from plyer import notification
 
 def ask_sleep_time():
     """
-    workout(time, day) function
+    ask_sleep_time
 
     This function asks for inputs
     """
-    print("Note: Please enter with the 24 hour format and 2 digits only")
     while True: # asks at what hour does the user want to sleep
         sleep_hour = input("At what hour do you want to sleep?\n")
         if len(sleep_hour) != 2:
@@ -51,7 +49,7 @@ def ask_sleep_time():
 
     return int(sleep_hour), int(sleep_minute), int(wake_hour), int(wake_minute)
 
-def sleep_time_check():
+def sleep_time_check(sleep_hour, sleep_minute, wake_hour, wake_minute):
     """
     sleep_time_check
 
@@ -61,12 +59,11 @@ def sleep_time_check():
     """
     minimum_req = 420 # 7 hours
     maximum_req = 540 # 9 hours
-    sleep_hour, sleep_minute, wake_hour, wake_minute = ask_sleep_time()
     wake_hour = wake_hour + 24
     total_sleep_time = (wake_hour - sleep_hour)*60 + (wake_minute - sleep_minute) # calculate the total amount of sleep
     return total_sleep_time >= minimum_req and total_sleep_time <= maximum_req
 
-def sleep_wake(current_time):
+def sleep_wake(sleep_hour, sleep_minute, wake_hour, wake_minute, current_time):
     """
     sleep
 
@@ -74,17 +71,15 @@ def sleep_wake(current_time):
     if the given scheduled time is equivalent
     to the current time
     """
-    while True:
-        if sleep_time_check() is True:
-            break
-        print("Please set a sleeping schedule for 7-9 hours")
-    sleep_hour, sleep_minute, wake_hour, wake_minute = ask_sleep_time()
     if f"{sleep_hour} {sleep_minute} 00" == current_time:
-        pync.notify("Hey, it's time to sleep", title="Sleep Reminder")
-    if f"{wake_hour} {wake_minute} 00" == current_time:
-        pync.notify("Hey, it's time to wake up", title="Wake Up Reminder")
-
-
-if __name__ == "__main__":
-    curr_time = datetime.now()
-    sleep_wake(curr_time.strftime("%H %M %S"))
+        notification.notify(
+            title="Sleep Reminder",
+            message="It's time to sleep",
+            timeout=10
+            )
+    if f"0{wake_hour} {wake_minute} 00" == current_time:
+        notification.notify(
+            title="Wake Up Reminder",
+            message="Rise and shine",
+            timeout=10
+            )
