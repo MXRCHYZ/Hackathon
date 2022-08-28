@@ -47,7 +47,7 @@ def ask_sleep_time():
         else:
             break
 
-    return int(sleep_hour), int(sleep_minute), int(wake_hour), int(wake_minute)
+    return sleep_hour, sleep_minute, wake_hour, wake_minute
 
 def sleep_time_check(sleep_hour, sleep_minute, wake_hour, wake_minute):
     """
@@ -59,8 +59,10 @@ def sleep_time_check(sleep_hour, sleep_minute, wake_hour, wake_minute):
     """
     minimum_req = 420 # 7 hours
     maximum_req = 540 # 9 hours
-    wake_hour = wake_hour + 24
-    total_sleep_time = (wake_hour - sleep_hour)*60 + (wake_minute - sleep_minute) # calculate the total amount of sleep
+    sleep_wake_hour = int(wake_hour) - int(sleep_hour)
+    if sleep_wake_hour < 0: # negative number
+        sleep_wake_hour += 24
+    total_sleep_time = (sleep_wake_hour)*60 + (int(wake_minute) - int(sleep_minute)) # calculate the total amount of sleep
     return total_sleep_time >= minimum_req and total_sleep_time <= maximum_req
 
 def sleep_wake(sleep_hour, sleep_minute, wake_hour, wake_minute, current_time):
@@ -77,9 +79,10 @@ def sleep_wake(sleep_hour, sleep_minute, wake_hour, wake_minute, current_time):
             message="It's time to sleep",
             timeout=10
             )
-    if f"0{wake_hour} {wake_minute} 00" == current_time:
+    if f"{wake_hour} {wake_minute} 00" == current_time:
         notification.notify(
             title="Wake Up Reminder",
             message="Rise and shine",
             timeout=10
             )
+        return True
